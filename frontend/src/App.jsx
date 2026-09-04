@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import "./App.css";
 
+const API_URL =
+  import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+
 function App() {
   const [stocks, setStocks] = useState([]);
   const [symbol, setSymbol] = useState("");
@@ -8,7 +11,7 @@ function App() {
   const [loadingInsight, setLoadingInsight] = useState({});
 
   const fetchStocks = () => {
-    fetch("http://127.0.0.1:8000/watchlist")
+    fetch(`${API_URL}/watchlist`)
       .then((response) => response.json())
       .then((data) => setStocks(data))
       .catch((error) => console.error("Error:", error));
@@ -24,18 +27,15 @@ function App() {
       return;
     }
 
-    const response = await fetch(
-      "http://127.0.0.1:8000/watchlist",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          symbol: symbol.trim(),
-        }),
-      }
-    );
+    const response = await fetch(`${API_URL}/watchlist`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        symbol: symbol.trim(),
+      }),
+    });
 
     if (!response.ok) {
       const error = await response.json();
@@ -49,12 +49,9 @@ function App() {
   };
 
   const removeStock = async (symbol) => {
-    await fetch(
-      `http://127.0.0.1:8000/watchlist/${symbol}`,
-      {
-        method: "DELETE",
-      }
-    );
+    await fetch(`${API_URL}/watchlist/${symbol}`, {
+      method: "DELETE",
+    });
 
     setInsights((prev) => {
       const updated = { ...prev };
@@ -66,12 +63,9 @@ function App() {
   };
 
   const markAsSeen = async (symbol) => {
-    await fetch(
-      `http://127.0.0.1:8000/watchlist/${symbol}/mark-seen`,
-      {
-        method: "POST",
-      }
-    );
+    await fetch(`${API_URL}/watchlist/${symbol}/mark-seen`, {
+      method: "POST",
+    });
 
     setInsights((prev) => {
       const updated = { ...prev };
@@ -90,7 +84,7 @@ function App() {
 
     try {
       const response = await fetch(
-        `http://127.0.0.1:8000/watchlist/${symbol}/ai-insight`
+        `${API_URL}/watchlist/${symbol}/ai-insight`
       );
 
       const data = await response.json();
